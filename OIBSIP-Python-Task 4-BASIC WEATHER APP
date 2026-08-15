@@ -1,0 +1,45 @@
+import requests
+
+API_KEY = "YOUR_API_KEY"
+
+city = input("Enter city name: ")
+
+if city == "":
+    print("City name cannot be empty!")
+else:
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+
+    try:
+        response = requests.get(url, timeout=5)
+        data = response.json()
+
+        if response.status_code == 200:
+            temp = data["main"]["temp"]
+            humidity = data["main"]["humidity"]
+            weather = data["weather"][0]["description"]
+            wind = data["wind"]["speed"]
+
+            fahrenheit = (temp * 9/5) + 32
+
+            print("\n--- Weather Details ---")
+            print("City:", city)
+            print("Temperature:", temp, "°C")
+            print("Temperature:", round(fahrenheit, 2), "°F")
+            print("Humidity:", humidity, "%")
+            print("Weather:", weather)
+            print("Wind Speed:", wind, "m/s")
+
+        elif response.status_code == 404:
+            print("City not found!")
+
+        elif response.status_code == 401:
+            print("Invalid API key!")
+
+        else:
+            print("Something went wrong!")
+
+    except requests.exceptions.Timeout:
+        print("Network timeout!")
+
+    except requests.exceptions.RequestException:
+        print("Network error!")
